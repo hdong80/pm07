@@ -89,6 +89,30 @@
             cursor: pointer;
             box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
+.summary-container {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 100; /* 다른 요소 위에 표시하기 위해 z-index 설정 */
+}
+
+.summary-button {
+    background-color: #ffa07a;
+    padding: 12px 24px; /* 기존 패딩보다 크게 설정 */
+    margin: 0 10px;
+    border-radius: 16px;
+    font-size: 24px; /* 기존 폰트 크기보다 크게 설정 */
+    cursor: pointer;
+    border: none;
+    outline: none;
+}
 
         .status-button {
             background-color: #ffa07a;
@@ -100,22 +124,7 @@
             outline: none;
         }
 
-        .summary-container {
-            display: flex;
-            justify-content: center;
-            margin-top: 15px;
-        }
-
-        .summary-button {
-            background-color: #ffa07a;
-            padding: 6px 12px;
-            margin: 0 5px;
-            border-radius: 16px;
-            font-size: 12px;
-            cursor: pointer;
-            border: none;
-            outline: none;
-        }
+        
 
         .number-button {
             background-color: purple;
