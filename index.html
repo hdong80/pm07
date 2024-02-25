@@ -236,7 +236,7 @@
 <div class="date-info-container">
     <div id="date-info" class="date-info"></div>
 </div>
-<div class="event-name-container">
+<div class="event-name-container" style="text-align: center;">
     <input type="text" id="event-name-input" placeholder="[행사명을 입력하세요]" style="font-size: 24px; text-align: center; width: 80%; margin: 20px auto; padding: 10px;">
 </div>
 <div id="participants" class="container"></div>
@@ -399,86 +399,113 @@
    
   
    
-    window.onload = () => {
-        displayParticipants();
-        showDateInfo();
-        setupButtons(); // 버튼 기능 설정
-        restoreParticipantStates(); // 참가자 상태 복원
-        updateSummaryCounts(); // 출석, 지각, 결석 수 업데이트
-    };
+  window.onload = () => {
+    displayParticipants();
+    showDateInfo();
+    setupButtons(); // 버튼 기능 설정
+    restoreParticipantStates(); // 참가자 상태 복원
+    restoreEventData(); // 이벤트 데이터 복원
+    updateSummaryCounts(); // 출석, 지각, 결석 수 업데이트
+};
 
-    function setupButtons() {
-        const allAttendanceButton = document.getElementById('all-attendance-button');
-        const resetButton = document.getElementById('reset-button');
-        
-        allAttendanceButton.addEventListener('click', function() {
-            document.querySelectorAll('.participant').forEach((participant, index) => {
-                participant.style.backgroundColor = 'lightskyblue';
-                const statusButton = participant.querySelector('.status-button');
-                statusButton.textContent = '출석';
-                saveParticipantState(index, { clickCount: 1, status: '출석', backgroundColor: 'lightskyblue' });
-            });
-            updateSummaryCounts();
-        });
+function restoreEventData() {
+    const eventNameInput = document.getElementById('event-name-input');
+    const noteInput = document.getElementById('note-input');
 
-        resetButton.addEventListener('click', function() {
-            localStorage.removeItem('participantsState');
-            location.reload();
-        });
+    // 로컬 스토리지에서 저장된 값 불러오기
+    const eventName = localStorage.getItem('eventName');
+    const note = localStorage.getItem('note');
+
+    // 값이 있으면 입력란에 채우기
+    if (eventName) {
+        eventNameInput.value = eventName;
+    }
+    if (note) {
+        noteInput.value = note;
     }
 
-    function showDateInfo() {
-        const dateInfoElement = document.getElementById('date-info');
-        const today = new Date();
-        const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
-        const dateString = today.toLocaleDateString('ko-KR', options);
-        dateInfoElement.textContent = dateString;
-    }
+    // 입력값이 변경될 때마다 로컬 스토리지에 저장
+    eventNameInput.addEventListener('input', function() {
+        localStorage.setItem('eventName', this.value);
+    });
+    noteInput.addEventListener('input', function() {
+        localStorage.setItem('note', this.value);
+    });
+}
 
-    function restoreParticipantStates() {
-        const participantElements = document.querySelectorAll('.participant');
-        participantElements.forEach((element, index) => {
-            restoreParticipantState(element, index, (state) => {
-                const statusButton = element.querySelector('.status-button');
-                element.style.backgroundColor = state.backgroundColor;
-                statusButton.textContent = state.status;
-                // 터치 횟수가 0이 아닌 경우에만 상태를 업데이트
-                if (state.clickCount !== 0) {
-                    updateSummaryCounts();
-                }
-            });
+function setupButtons() {
+    const allAttendanceButton = document.getElementById('all-attendance-button');
+    const resetButton = document.getElementById('reset-button');
+    
+    allAttendanceButton.addEventListener('click', function() {
+        document.querySelectorAll('.participant').forEach((participant, index) => {
+            participant.style.backgroundColor = 'lightskyblue';
+            const statusButton = participant.querySelector('.status-button');
+            statusButton.textContent = '출석';
+            saveParticipantState(index, { clickCount: 1, status: '출석', backgroundColor: 'lightskyblue' });
         });
-    }
+        updateSummaryCounts();
+    });
 
-    function updateSummaryCounts() {
-        let attendanceCount = 0;
-        let tardyCount = 0;
-        let absentCount = 0;
+    resetButton.addEventListener('click', function() {
+        localStorage.removeItem('participantsState');
+        location.reload();
+    });
+}
 
-        const participantElements = document.querySelectorAll('.participant');
-        participantElements.forEach(element => {
+function showDateInfo() {
+    const dateInfoElement = document.getElementById('date-info');
+    const today = new Date();
+    const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+    const dateString = today.toLocaleDateString('ko-KR', options);
+    dateInfoElement.textContent = dateString;
+}
+
+function restoreParticipantStates() {
+    const participantElements = document.querySelectorAll('.participant');
+    participantElements.forEach((element, index) => {
+        restoreParticipantState(element, index, (state) => {
             const statusButton = element.querySelector('.status-button');
-            if (statusButton.textContent === '출석') {
-                attendanceCount++;
-            } else if (statusButton.textContent === '지각') {
-                tardyCount++;
-            } else if (statusButton.textContent === '결석') {
-                absentCount++;
+            element.style.backgroundColor = state.backgroundColor;
+            statusButton.textContent = state.status;
+            // 터치 횟수가 0이 아닌 경우에만 상태를 업데이트
+            if (state.clickCount !== 0) {
+                updateSummaryCounts();
             }
         });
+    });
+}
 
-        const attendanceSummaryButton = document.getElementById('attendance-summary');
-        const tardySummaryButton = document.getElementById('tardy-summary');
-        const absentSummaryButton = document.getElementById('absent-summary');
-        attendanceSummaryButton.textContent = `출석: ${attendanceCount}`;
-        tardySummaryButton.textContent = `지각: ${tardyCount}`;
-        absentSummaryButton.textContent = `결석: ${absentCount}`;
+function updateSummaryCounts() {
+    let attendanceCount = 0;
+    let tardyCount = 0;
+    let absentCount = 0;
 
-        // 로컬 스토리지에 출석, 지각, 결석 수를 저장
-        localStorage.setItem('attendanceCount', attendanceCount);
-        localStorage.setItem('tardyCount', tardyCount);
-        localStorage.setItem('absentCount', absentCount);
-    }
+    const participantElements = document.querySelectorAll('.participant');
+    participantElements.forEach(element => {
+        const statusButton = element.querySelector('.status-button');
+        if (statusButton.textContent === '출석') {
+            attendanceCount++;
+        } else if (statusButton.textContent === '지각') {
+            tardyCount++;
+        } else if (statusButton.textContent === '결석') {
+            absentCount++;
+        }
+    });
+
+    const attendanceSummaryButton = document.getElementById('attendance-summary');
+    const tardySummaryButton = document.getElementById('tardy-summary');
+    const absentSummaryButton = document.getElementById('absent-summary');
+    attendanceSummaryButton.textContent = `출석: ${attendanceCount}`;
+    tardySummaryButton.textContent = `지각: ${tardyCount}`;
+    absentSummaryButton.textContent = `결석: ${absentCount}`;
+
+    // 로컬 스토리지에 출석, 지각, 결석 수를 저장
+    localStorage.setItem('attendanceCount', attendanceCount);
+    localStorage.setItem('tardyCount', tardyCount);
+    localStorage.setItem('absentCount', absentCount);
+}
+
 </script>
 
 
