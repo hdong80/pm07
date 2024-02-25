@@ -8,16 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Dongle:wght@300&display=swap" rel="stylesheet">
     <!-- HTML2Canvas 라이브러리 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>출석체크 명렬표</title>
-    <!-- Google Fonts에서 Dongle 폰트 가져오기 -->
-    <link href="https://fonts.googleapis.com/css2?family=Dongle:wght@300&display=swap" rel="stylesheet">
-    <!-- HTML2Canvas 라이브러리 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
     <style>
         body {
             font-family: 'Dongle', sans-serif;
@@ -263,35 +253,6 @@
         <button id="popup-close-button" class="popup-close-button">&times;</button>
     </div>
 </div>
-</head>
-<body>
-
-<div class="date-info-container">
-    <div id="date-info" class="date-info"></div>
-</div>
-
-<button id="all-attendance-button" class="summary-button" style="background-color: #ffa07a; margin-bottom: 20px;">전체 출석</button>
-
-<div id="participants" class="container"></div>
-
-<button id="reset-button" class="reset-button">전체 초기화</button>
-<button id="capture-button" class="capture-button">화면 캡처</button>
-
-
-<div class="fixed-container">
-    <button id="all-attendance-button" class="control-button">올출석</button>
-    <button id="reset-button" class="control-button">리셋</button>
-    <button id="attendance-summary" class="summary-button">출석: 0</button>
-    <button id="tardy-summary" class="summary-button">지각: 0</button>
-    <button id="absent-summary" class="summary-button">결석: 0</button>
-</div>
-
-<div id="popup-overlay" class="popup-overlay">
-    <div class="popup-content">
-        <img id="popup-image" class="popup-image" src="" alt="Captured Image">
-        <button id="popup-close-button" class="popup-close-button">&times;</button>
-    </div>
-</div>
 
 <script>
     async function fetchSheetData() {
@@ -436,8 +397,7 @@
     window.onload = () => {
         displayParticipants();
         showDateInfo();
-        setupButtons(); // 버튼 기능 설정
-        restoreParticipantStates(); // 참가자 상태 복원
+        setupButtons(); // 버튼 기능을 설정하는 함수 호출
     };
 
     function setupButtons() {
@@ -489,18 +449,6 @@
         attendanceSummaryButton.textContent = `출석: ${attendanceCount}`;
         tardySummaryButton.textContent = `지각: ${tardyCount}`;
         absentSummaryButton.textContent = `결석: ${absentCount}`;
-    }
-
-    function restoreParticipantStates() {
-        const participantElements = document.querySelectorAll('.participant');
-        participantElements.forEach((element, index) => {
-            restoreParticipantState(element, index, (state) => {
-                const statusButton = element.querySelector('.status-button');
-                element.style.backgroundColor = state.backgroundColor;
-                statusButton.textContent = state.status;
-            });
-        });
-        updateSummaryCounts(); // 페이지 로드 시 요약 정보 업데이트
     }
 </script>
 
