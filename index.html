@@ -450,6 +450,51 @@
         tardySummaryButton.textContent = `지각: ${tardyCount}`;
         absentSummaryButton.textContent = `결석: ${absentCount}`;
     }
+    window.onload = () => {
+        displayParticipants();
+        showDateInfo();
+        setupButtons(); // 버튼 기능 설정
+        restoreParticipantStates(); // 참가자 상태 복원
+        updateSummaryCounts(); // 출석, 지각, 결석 수 업데이트
+    };
+
+    function restoreParticipantStates() {
+        const participantElements = document.querySelectorAll('.participant');
+        participantElements.forEach((element, index) => {
+            restoreParticipantState(element, index, (state) => {
+                const statusButton = element.querySelector('.status-button');
+                element.style.backgroundColor = state.backgroundColor;
+                statusButton.textContent = state.status;
+            });
+        });
+    }
+
+    // 페이지 로드 시 출석, 지각, 결석 수 업데이트
+    function updateSummaryCounts() {
+        let attendanceCount = 0;
+        let tardyCount = 0;
+        let absentCount = 0;
+
+        const participantElements = document.querySelectorAll('.participant');
+        participantElements.forEach(element => {
+            const statusButton = element.querySelector('.status-button');
+            if (statusButton.textContent === '출석') {
+                attendanceCount++;
+            } else if (statusButton.textContent === '지각') {
+                tardyCount++;
+            } else if (statusButton.textContent === '결석') {
+                absentCount++;
+            }
+        });
+
+        const attendanceSummaryButton = document.getElementById('attendance-summary');
+        const tardySummaryButton = document.getElementById('tardy-summary');
+        const absentSummaryButton = document.getElementById('absent-summary');
+        attendanceSummaryButton.textContent = `출석: ${attendanceCount}`;
+        tardySummaryButton.textContent = `지각: ${tardyCount}`;
+        absentSummaryButton.textContent = `결석: ${absentCount}`;
+    }
+
 </script>
 
 </body>
