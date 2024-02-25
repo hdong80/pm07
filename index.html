@@ -474,12 +474,7 @@
         absentSummaryButton.textContent = `결석: ${absentCount}`;
     }
     
-    window.onload = () => {
-    displayParticipants();
-    showDateInfo();
-    setupAllAttendanceButton();
-    restoreAllParticipantStates();
-};
+    
 
 // 저장된 상태 복원 함수
 function restoreAllParticipantStates() {
@@ -527,7 +522,12 @@ function saveParticipantState(index, state) {
     participantsState[index] = state;
     localStorage.setItem('participantsState', JSON.stringify(participantsState));
 }
-
+window.onload = () => {
+    displayParticipants();
+    showDateInfo();
+    setupAllAttendanceButton();
+    restoreAllParticipantStates();
+};
 </script>
 
 </body>
