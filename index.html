@@ -395,7 +395,10 @@
     }
 
    
-   window.onload = () => {
+   <script>
+    // 이전 코드 생략...
+
+    window.onload = () => {
         displayParticipants();
         showDateInfo();
         setupButtons(); // 버튼 기능 설정
@@ -410,6 +413,10 @@
                 const statusButton = element.querySelector('.status-button');
                 element.style.backgroundColor = state.backgroundColor;
                 statusButton.textContent = state.status;
+                // 터치 횟수가 0이 아닌 경우에만 상태를 업데이트
+                if (state.clickCount !== 0) {
+                    updateSummaryCounts();
+                }
             });
         });
     }
@@ -464,6 +471,7 @@
         });
     }
 </script>
+
 
 </body>
 </html>
