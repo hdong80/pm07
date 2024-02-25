@@ -394,10 +394,11 @@
         });
     }
 
-    window.onload = () => {
+   window.onload = () => {
         displayParticipants();
         showDateInfo();
-        setupButtons(); // 버튼 기능을 설정하는 함수 호출
+        setupButtons(); // 버튼 기능 설정
+        restoreParticipantStates(); // 참가자 상태 복원
     };
 
     function setupButtons() {
@@ -420,36 +421,18 @@
         });
     }
 
-    function showDateInfo() {
-        const dateInfoElement = document.getElementById('date-info');
-        const today = new Date();
-        const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
-        const dateString = today.toLocaleDateString('ko-KR', options);
-        dateInfoElement.textContent = dateString;
+    function restoreParticipantStates() {
+        const participantElements = document.querySelectorAll('.participant');
+        participantElements.forEach((element, index) => {
+            restoreParticipantState(element, index, (state) => {
+                const statusButton = element.querySelector('.status-button');
+                element.style.backgroundColor = state.backgroundColor;
+                statusButton.textContent = state.status;
+            });
+        });
+        updateSummaryCounts(); // 페이지 로드 시 요약 정보 업데이트
     }
 
-    function updateSummaryCounts() {
-        const participantElements = document.querySelectorAll('.participant');
-        let attendanceCount = 0;
-        let tardyCount = 0;
-        let absentCount = 0;
-        participantElements.forEach(element => {
-            const statusButton = element.querySelector('.status-button');
-            if (statusButton.textContent === '출석') {
-                attendanceCount++;
-            } else if (statusButton.textContent === '지각') {
-                tardyCount++;
-            } else if (statusButton.textContent === '결석') {
-                absentCount++;
-            }
-        });
-        const attendanceSummaryButton = document.getElementById('attendance-summary');
-        const tardySummaryButton = document.getElementById('tardy-summary');
-        const absentSummaryButton = document.getElementById('absent-summary');
-        attendanceSummaryButton.textContent = `출석: ${attendanceCount}`;
-        tardySummaryButton.textContent = `지각: ${tardyCount}`;
-        absentSummaryButton.textContent = `결석: ${absentCount}`;
-    }
 </script>
 
 </body>
