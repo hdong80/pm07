@@ -474,26 +474,23 @@
         absentSummaryButton.textContent = `결석: ${absentCount}`;
     }
     
-    function setupButtons() {
-    const allAttendanceButton = document.getElementById('all-attendance-button');
-    const resetButton = document.getElementById('reset-button');
-    
-    // "올출석" 버튼에 대한 클릭 이벤트 리스너
-    allAttendanceButton.addEventListener('click', function() {
-        document.querySelectorAll('.participant').forEach((participant, index) => {
-            const statusButton = participant.querySelector('.status-button');
-            participant.style.backgroundColor = 'lightskyblue'; // 출석 상태로 배경색 변경
-            statusButton.textContent = '출석'; // 상태 텍스트를 '출석'으로 변경
-            saveParticipantState(index, { clickCount: 1, status: '출석', backgroundColor: 'lightskyblue' });
-        });
-        updateSummaryCounts(); // 출석 상태 요약 정보 업데이트
-    });
+    window.onload = () => {
+    displayParticipants();
+    showDateInfo();
+    setupAllAttendanceButton();
+    restoreAllParticipantStates();
+};
 
-    // "리셋" 버튼에 대한 클릭 이벤트 리스너
-    resetButton.addEventListener('click', function() {
-        if (confirm('전체 상태를 초기화하시겠습니까?')) { // 사용자에게 초기화 확인 요청
-            localStorage.removeItem('participantsState'); // localStorage에서 참가자 상태 정보 제거
-            location.reload(); // 페이지 새로고침
+// 저장된 상태 복원 함수
+function restoreAllParticipantStates() {
+    const participantsState = JSON.parse(localStorage.getItem('participantsState') || '{}');
+    const participantElements = document.querySelectorAll('.participant');
+    participantElements.forEach((element, index) => {
+        const state = participantsState[index];
+        if (state) {
+            const statusButton = element.querySelector('.status-button');
+            element.style.backgroundColor = state.backgroundColor;
+            statusButton.textContent = state.status;
         }
     });
 }
@@ -524,11 +521,12 @@ resetButton.onclick = () => {
     updateSummaryCounts();
 };
 
-window.onload = function() {
-    displayParticipants();
-    showDateInfo();
-    setupButtons(); // 버튼 기능을 설정하는 함수 호출
-};
+// 상태 저장 함수
+function saveParticipantState(index, state) {
+    const participantsState = JSON.parse(localStorage.getItem('participantsState') || '{}');
+    participantsState[index] = state;
+    localStorage.setItem('participantsState', JSON.stringify(participantsState));
+}
 
 </script>
 
