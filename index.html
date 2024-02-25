@@ -498,6 +498,31 @@
     });
 }
 
+// 올출석(전체 출석) 버튼의 기능
+const allAttendanceButton = document.getElementById('all-attendance-button');
+allAttendanceButton.onclick = () => {
+    const participantElements = document.querySelectorAll('.participant');
+    participantElements.forEach((element, index) => {
+        const statusButton = element.querySelector('.status-button');
+        element.style.backgroundColor = 'lightskyblue';
+        statusButton.textContent = '출석';
+        saveParticipantState(index, { clickCount: 1, status: '출석', backgroundColor: 'lightskyblue' });
+    });
+    updateSummaryCounts();
+};
+
+// 리셋(전체 초기화) 버튼의 기능
+const resetButton = document.getElementById('reset-button');
+resetButton.onclick = () => {
+    localStorage.removeItem('participantsState');
+    const participantElements = document.querySelectorAll('.participant');
+    participantElements.forEach((element) => {
+        const statusButton = element.querySelector('.status-button');
+        element.style.backgroundColor = element.dataset.defaultColor;
+        statusButton.textContent = '터치';
+    });
+    updateSummaryCounts();
+};
 
 window.onload = function() {
     displayParticipants();
