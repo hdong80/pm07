@@ -396,6 +396,7 @@
 
    
   
+   
     window.onload = () => {
         displayParticipants();
         showDateInfo();
@@ -403,7 +404,8 @@
         restoreParticipantStates(); // 참가자 상태 복원
         updateSummaryCounts(); // 출석, 지각, 결석 수 업데이트
     };
-function setupButtons() {
+
+    function setupButtons() {
         const allAttendanceButton = document.getElementById('all-attendance-button');
         const resetButton = document.getElementById('reset-button');
         
@@ -429,6 +431,8 @@ function setupButtons() {
         const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
         const dateString = today.toLocaleDateString('ko-KR', options);
         dateInfoElement.textContent = dateString;
+    }
+
     function restoreParticipantStates() {
         const participantElements = document.querySelectorAll('.participant');
         participantElements.forEach((element, index) => {
@@ -473,27 +477,8 @@ function setupButtons() {
         localStorage.setItem('tardyCount', tardyCount);
         localStorage.setItem('absentCount', absentCount);
     }
-
-    function setupButtons() {
-        const allAttendanceButton = document.getElementById('all-attendance-button');
-        const resetButton = document.getElementById('reset-button');
-
-        allAttendanceButton.addEventListener('click', function() {
-            document.querySelectorAll('.participant').forEach((participant, index) => {
-                participant.style.backgroundColor = 'lightskyblue';
-                const statusButton = participant.querySelector('.status-button');
-                statusButton.textContent = '출석';
-                saveParticipantState(index, { clickCount: 1, status: '출석', backgroundColor: 'lightskyblue' });
-            });
-            updateSummaryCounts();
-        });
-
-        resetButton.addEventListener('click', function() {
-            localStorage.clear(); // 로컬 스토리지 초기화
-            location.reload();
-        });
-    }
 </script>
+
 
 
 </body>
