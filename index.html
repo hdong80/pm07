@@ -119,13 +119,23 @@
     left: 0;
     width: 100%;
     display: flex;
-    justify-content: space-around; /* 버튼들이 공간을 균등하게 차지하도록 설정 */
-    align-items: center;
+    justify-content: space-around; /* 내부 버튼들이 균등하게 배치되도록 설정 */
     padding: 10px 0;
     background-color: rgba(255, 255, 255, 0.9);
     border-top: 1px solid #ddd; /* 상단에 경계선 추가 */
-    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.2); /* 상단 그림자 효과 */
-    z-index: 1000; /* 다른 요소 위에 표시 */
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.2); /* 상단에 그림자 효과 */
+    z-index: 100; /* 다른 요소 위에 표시 */
+}
+
+.control-button, .summary-button {
+    background-color: #ffa07a;
+    padding: 12px 24px; /* 크기를 두 배로 증가 */
+    margin: 0 5px;
+    border-radius: 16px;
+    font-size: 18px; /* 폰트 크기 증가 */
+    cursor: pointer;
+    border: none;
+    outline: none;
 }
         .status-button {
             background-color: #ffa07a;
