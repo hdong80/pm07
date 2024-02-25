@@ -89,54 +89,57 @@
             cursor: pointer;
             box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
-.summary-container {
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    justify-content: center;
-    padding: 10px;
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    z-index: 100; /* 다른 요소 위에 표시하기 위해 z-index 설정 */
-}
 
-.summary-button {
-    background-color: #ffa07a;
-    padding: 12px 24px; /* 기존 패딩보다 크게 설정 */
-    margin: 0 10px;
-    border-radius: 16px;
-    font-size: 24px; /* 기존 폰트 크기보다 크게 설정 */
-    cursor: pointer;
-    border: none;
-    outline: none;
-}
-.fixed-container {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    display: flex;
-    justify-content: space-around; /* 내부 버튼들이 균등하게 배치되도록 설정 */
-    padding: 10px 0;
-    background-color: rgba(255, 255, 255, 0.9);
-    border-top: 1px solid #ddd; /* 상단에 경계선 추가 */
-    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.2); /* 상단에 그림자 효과 */
-    z-index: 100; /* 다른 요소 위에 표시 */
-}
+        .summary-container {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            z-index: 100; /* 다른 요소 위에 표시하기 위해 z-index 설정 */
+        }
 
-.control-button, .summary-button {
-    background-color: #ffa07a;
-    padding: 12px 24px; /* 크기를 두 배로 증가 */
-    margin: 0 5px;
-    border-radius: 16px;
-    font-size: 18px; /* 폰트 크기 증가 */
-    cursor: pointer;
-    border: none;
-    outline: none;
-}
+        .summary-button {
+            background-color: #ffa07a;
+            padding: 12px 24px; /* 기존 패딩보다 크게 설정 */
+            margin: 0 10px;
+            border-radius: 16px;
+            font-size: 24px; /* 기존 폰트 크기보다 크게 설정 */
+            cursor: pointer;
+            border: none;
+            outline: none;
+        }
+
+        .fixed-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around; /* 내부 버튼들이 균등하게 배치되도록 설정 */
+            padding: 10px 0;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-top: 1px solid #ddd; /* 상단에 경계선 추가 */
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.2); /* 상단에 그림자 효과 */
+            z-index: 100; /* 다른 요소 위에 표시 */
+        }
+
+        .control-button, .summary-button {
+            background-color: #ffa07a;
+            padding: 12px 24px; /* 크기를 두 배로 증가 */
+            margin: 0 5px;
+            border-radius: 16px;
+            font-size: 18px; /* 폰트 크기 증가 */
+            cursor: pointer;
+            border: none;
+            outline: none;
+        }
+
         .status-button {
             background-color: #ffa07a;
             padding: 8px 15px;
@@ -146,8 +149,6 @@
             border: none;
             outline: none;
         }
-
-        
 
         .number-button {
             background-color: purple;
@@ -220,15 +221,14 @@
             cursor: pointer;
         }
 
-    .fixed-container {
-        flex-wrap: nowrap; /* 한 줄에 모든 버튼을 유지 */
-    }
+        .fixed-container {
+            flex-wrap: nowrap; /* 한 줄에 모든 버튼을 유지 */
+        }
 
-    .control-button, .summary-button {
-        font-size: 12px; /* 모바일에서 폰트 크기를 더 줄임 */
-        padding: 4px 8px; /* 모바일에서 패딩을 더 줄임 */
-    }
-}
+        .control-button, .summary-button {
+            font-size: 12px; /* 모바일에서 폰트 크기를 더 줄임 */
+            padding: 4px 8px; /* 모바일에서 패딩을 더 줄임 */
+        }
     </style>
 </head>
 <body>
@@ -237,13 +237,7 @@
     <div id="date-info" class="date-info"></div>
 </div>
 
-<button id="all-attendance-button" class="summary-button" style="background-color: #ffa07a; margin-bottom: 20px;">전체 출석</button>
-
 <div id="participants" class="container"></div>
-
-<button id="reset-button" class="reset-button">전체 초기화</button>
-<button id="capture-button" class="capture-button">화면 캡처</button>
-
 
 <div class="fixed-container">
     <button id="all-attendance-button" class="control-button">올출석</button>
@@ -403,45 +397,28 @@
     window.onload = () => {
         displayParticipants();
         showDateInfo();
-        setupAllAttendanceButton();
+        setupButtons(); // 버튼 기능을 설정하는 함수 호출
     };
 
-    function setupAllAttendanceButton() {
+    function setupButtons() {
         const allAttendanceButton = document.getElementById('all-attendance-button');
-        allAttendanceButton.onclick = () => {
-            const participantElements = document.querySelectorAll('.participant');
-            participantElements.forEach((element, index) => {
-                const statusButton = element.querySelector('.status-button');
-                element.style.backgroundColor = 'lightskyblue';
+        const resetButton = document.getElementById('reset-button');
+        
+        allAttendanceButton.addEventListener('click', function() {
+            document.querySelectorAll('.participant').forEach((participant, index) => {
+                participant.style.backgroundColor = 'lightskyblue';
+                const statusButton = participant.querySelector('.status-button');
                 statusButton.textContent = '출석';
                 saveParticipantState(index, { clickCount: 1, status: '출석', backgroundColor: 'lightskyblue' });
             });
             updateSummaryCounts();
-        };
-    }
-
-    const resetButton = document.getElementById('reset-button');
-    resetButton.onclick = () => {
-        localStorage.removeItem('participantsState');
-        window.location.reload();
-    };
-
-    const captureButton = document.getElementById('capture-button');
-    const popupOverlay = document.getElementById('popup-overlay');
-    const popupImage = document.getElementById('popup-image');
-    const popupCloseButton = document.getElementById('popup-close-button');
-
-    captureButton.onclick = () => {
-        html2canvas(document.querySelector('.container')).then(canvas => {
-            const imageData = canvas.toDataURL();
-            popupImage.src = imageData;
-            popupOverlay.style.display = 'flex';
         });
-    };
 
-    popupCloseButton.onclick = () => {
-        popupOverlay.style.display = 'none';
-    };
+        resetButton.addEventListener('click', function() {
+            localStorage.removeItem('participantsState');
+            location.reload();
+        });
+    }
 
     function showDateInfo() {
         const dateInfoElement = document.getElementById('date-info');
@@ -473,32 +450,6 @@
         tardySummaryButton.textContent = `지각: ${tardyCount}`;
         absentSummaryButton.textContent = `결석: ${absentCount}`;
     }
-    function setupButtons() {
-    const allAttendanceButton = document.getElementById('all-attendance-button');
-    const resetButton = document.getElementById('reset-button');
-    
-    allAttendanceButton.addEventListener('click', function() {
-        document.querySelectorAll('.participant').forEach((participant, index) => {
-            participant.style.backgroundColor = 'lightskyblue';
-            const statusButton = participant.querySelector('.status-button');
-            statusButton.textContent = '출석';
-            saveParticipantState(index, { clickCount: 1, status: '출석', backgroundColor: 'lightskyblue' });
-        });
-        updateSummaryCounts();
-    });
-
-    resetButton.addEventListener('click', function() {
-        localStorage.removeItem('participantsState');
-        location.reload();
-    });
-}
-
-window.onload = function() {
-    displayParticipants();
-    showDateInfo();
-    setupButtons(); // 버튼 기능을 설정하는 함수 호출
-};
-
 </script>
 
 </body>
