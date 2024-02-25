@@ -473,25 +473,31 @@
         tardySummaryButton.textContent = `지각: ${tardyCount}`;
         absentSummaryButton.textContent = `결석: ${absentCount}`;
     }
+    
     function setupButtons() {
     const allAttendanceButton = document.getElementById('all-attendance-button');
     const resetButton = document.getElementById('reset-button');
     
+    // "올출석" 버튼에 대한 클릭 이벤트 리스너
     allAttendanceButton.addEventListener('click', function() {
         document.querySelectorAll('.participant').forEach((participant, index) => {
-            participant.style.backgroundColor = 'lightskyblue';
             const statusButton = participant.querySelector('.status-button');
-            statusButton.textContent = '출석';
+            participant.style.backgroundColor = 'lightskyblue'; // 출석 상태로 배경색 변경
+            statusButton.textContent = '출석'; // 상태 텍스트를 '출석'으로 변경
             saveParticipantState(index, { clickCount: 1, status: '출석', backgroundColor: 'lightskyblue' });
         });
-        updateSummaryCounts();
+        updateSummaryCounts(); // 출석 상태 요약 정보 업데이트
     });
 
+    // "리셋" 버튼에 대한 클릭 이벤트 리스너
     resetButton.addEventListener('click', function() {
-        localStorage.removeItem('participantsState');
-        location.reload();
+        if (confirm('전체 상태를 초기화하시겠습니까?')) { // 사용자에게 초기화 확인 요청
+            localStorage.removeItem('participantsState'); // localStorage에서 참가자 상태 정보 제거
+            location.reload(); // 페이지 새로고침
+        }
     });
 }
+
 
 window.onload = function() {
     displayParticipants();
