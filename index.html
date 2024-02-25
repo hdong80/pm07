@@ -473,61 +473,32 @@
         tardySummaryButton.textContent = `지각: ${tardyCount}`;
         absentSummaryButton.textContent = `결석: ${absentCount}`;
     }
+    function setupButtons() {
+    const allAttendanceButton = document.getElementById('all-attendance-button');
+    const resetButton = document.getElementById('reset-button');
     
-    
+    allAttendanceButton.addEventListener('click', function() {
+        document.querySelectorAll('.participant').forEach((participant, index) => {
+            participant.style.backgroundColor = 'lightskyblue';
+            const statusButton = participant.querySelector('.status-button');
+            statusButton.textContent = '출석';
+            saveParticipantState(index, { clickCount: 1, status: '출석', backgroundColor: 'lightskyblue' });
+        });
+        updateSummaryCounts();
+    });
 
-// 저장된 상태 복원 함수
-function restoreAllParticipantStates() {
-    const participantsState = JSON.parse(localStorage.getItem('participantsState') || '{}');
-    const participantElements = document.querySelectorAll('.participant');
-    participantElements.forEach((element, index) => {
-        const state = participantsState[index];
-        if (state) {
-            const statusButton = element.querySelector('.status-button');
-            element.style.backgroundColor = state.backgroundColor;
-            statusButton.textContent = state.status;
-        }
+    resetButton.addEventListener('click', function() {
+        localStorage.removeItem('participantsState');
+        location.reload();
     });
 }
 
-// 올출석(전체 출석) 버튼의 기능
-const allAttendanceButton = document.getElementById('all-attendance-button');
-allAttendanceButton.onclick = () => {
-    const participantElements = document.querySelectorAll('.participant');
-    participantElements.forEach((element, index) => {
-        const statusButton = element.querySelector('.status-button');
-        element.style.backgroundColor = 'lightskyblue';
-        statusButton.textContent = '출석';
-        saveParticipantState(index, { clickCount: 1, status: '출석', backgroundColor: 'lightskyblue' });
-    });
-    updateSummaryCounts();
-};
-
-// 리셋(전체 초기화) 버튼의 기능
-const resetButton = document.getElementById('reset-button');
-resetButton.onclick = () => {
-    localStorage.removeItem('participantsState');
-    const participantElements = document.querySelectorAll('.participant');
-    participantElements.forEach((element) => {
-        const statusButton = element.querySelector('.status-button');
-        element.style.backgroundColor = element.dataset.defaultColor;
-        statusButton.textContent = '터치';
-    });
-    updateSummaryCounts();
-};
-
-// 상태 저장 함수
-function saveParticipantState(index, state) {
-    const participantsState = JSON.parse(localStorage.getItem('participantsState') || '{}');
-    participantsState[index] = state;
-    localStorage.setItem('participantsState', JSON.stringify(participantsState));
-}
-window.onload = () => {
+window.onload = function() {
     displayParticipants();
     showDateInfo();
-    setupAllAttendanceButton();
-    restoreAllParticipantStates();
+    setupButtons(); // 버튼 기능을 설정하는 함수 호출
 };
+
 </script>
 
 </body>
