@@ -394,63 +394,8 @@
         });
     }
 
-    window.onload = () => {
-        displayParticipants();
-        showDateInfo();
-        setupButtons(); // 버튼 기능을 설정하는 함수 호출
-    };
-
-    function setupButtons() {
-        const allAttendanceButton = document.getElementById('all-attendance-button');
-        const resetButton = document.getElementById('reset-button');
-        
-        allAttendanceButton.addEventListener('click', function() {
-            document.querySelectorAll('.participant').forEach((participant, index) => {
-                participant.style.backgroundColor = 'lightskyblue';
-                const statusButton = participant.querySelector('.status-button');
-                statusButton.textContent = '출석';
-                saveParticipantState(index, { clickCount: 1, status: '출석', backgroundColor: 'lightskyblue' });
-            });
-            updateSummaryCounts();
-        });
-
-        resetButton.addEventListener('click', function() {
-            localStorage.removeItem('participantsState');
-            location.reload();
-        });
-    }
-
-    function showDateInfo() {
-        const dateInfoElement = document.getElementById('date-info');
-        const today = new Date();
-        const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
-        const dateString = today.toLocaleDateString('ko-KR', options);
-        dateInfoElement.textContent = dateString;
-    }
-
-    function updateSummaryCounts() {
-        const participantElements = document.querySelectorAll('.participant');
-        let attendanceCount = 0;
-        let tardyCount = 0;
-        let absentCount = 0;
-        participantElements.forEach(element => {
-            const statusButton = element.querySelector('.status-button');
-            if (statusButton.textContent === '출석') {
-                attendanceCount++;
-            } else if (statusButton.textContent === '지각') {
-                tardyCount++;
-            } else if (statusButton.textContent === '결석') {
-                absentCount++;
-            }
-        });
-        const attendanceSummaryButton = document.getElementById('attendance-summary');
-        const tardySummaryButton = document.getElementById('tardy-summary');
-        const absentSummaryButton = document.getElementById('absent-summary');
-        attendanceSummaryButton.textContent = `출석: ${attendanceCount}`;
-        tardySummaryButton.textContent = `지각: ${tardyCount}`;
-        absentSummaryButton.textContent = `결석: ${absentCount}`;
-    }
-    window.onload = () => {
+   
+   window.onload = () => {
         displayParticipants();
         showDateInfo();
         setupButtons(); // 버튼 기능 설정
@@ -469,7 +414,6 @@
         });
     }
 
-    // 페이지 로드 시 출석, 지각, 결석 수 업데이트
     function updateSummaryCounts() {
         let attendanceCount = 0;
         let tardyCount = 0;
@@ -493,8 +437,32 @@
         attendanceSummaryButton.textContent = `출석: ${attendanceCount}`;
         tardySummaryButton.textContent = `지각: ${tardyCount}`;
         absentSummaryButton.textContent = `결석: ${absentCount}`;
+
+        // 로컬 스토리지에 출석, 지각, 결석 수를 저장
+        localStorage.setItem('attendanceCount', attendanceCount);
+        localStorage.setItem('tardyCount', tardyCount);
+        localStorage.setItem('absentCount', absentCount);
     }
 
+    function setupButtons() {
+        const allAttendanceButton = document.getElementById('all-attendance-button');
+        const resetButton = document.getElementById('reset-button');
+
+        allAttendanceButton.addEventListener('click', function() {
+            document.querySelectorAll('.participant').forEach((participant, index) => {
+                participant.style.backgroundColor = 'lightskyblue';
+                const statusButton = participant.querySelector('.status-button');
+                statusButton.textContent = '출석';
+                saveParticipantState(index, { clickCount: 1, status: '출석', backgroundColor: 'lightskyblue' });
+            });
+            updateSummaryCounts();
+        });
+
+        resetButton.addEventListener('click', function() {
+            localStorage.clear(); // 로컬 스토리지 초기화
+            location.reload();
+        });
+    }
 </script>
 
 </body>
