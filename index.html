@@ -363,11 +363,29 @@
 
         return participantDiv;
     }
+	function updateAllStatusToAttendance() {
+    const participantElements = document.querySelectorAll('.participant');
+    participantElements.forEach((element, index) => {
+        const statusButton = element.querySelector('.status-button');
+        statusButton.textContent = '출석';
+        element.style.backgroundColor = 'lightskyblue'; // 출석 상태의 배경색
+
+        // 참가자 상태 저장 시 clickCount를 1로 설정
+        saveParticipantState(index, { clickCount: 1, status: '출석', backgroundColor: 'lightskyblue' });
+    });
+    updateSummaryCounts();
+    }
+
 
     function saveParticipantState(index, state) {
         const participantsState = JSON.parse(localStorage.getItem('participantsState') || '{}');
         participantsState[index] = state;
         localStorage.setItem('participantsState', JSON.stringify(participantsState));
+    }
+	
+	function resetAllStatus() {
+    localStorage.clear(); // 로컬 스토리지의 모든 데이터를 지웁니다.
+    location.reload(); // 페이지를 새로고침하여 모든 상태를 초기화합니다.
     }
 
     function restoreParticipantState(participantDiv, index, callback) {
@@ -447,73 +465,60 @@
     }
 
     function setupButtons() {
-        const allAttendanceButton = document.getElementById('all-attendance-button');
-        const resetButton = document.getElementById('reset-button');
+    const allAttendanceButton = document.getElementById('all-attendance-button');
+    const resetButton = document.getElementById('reset-button');
+    const copyButton = document.getElementById('copy-button');
 
-        allAttendanceButton.addEventListener('click', function() {
-            document.querySelectorAll('.participant').forEach((participant, index) => {
-                const statusButton = participant.querySelector('.status-button');
-                if (statusButton.textContent !== '출석') {
-                    statusButton.textContent = '출석';
-                    participant.style.backgroundColor = 'lightskyblue';
-                    saveParticipantState(index, { clickCount: 1, status: '출석', backgroundColor: 'lightskyblue' });
-                }
-            });
-            updateSummaryCounts();
-        });
+    allAttendanceButton.addEventListener('click', updateAllStatusToAttendance);
+    resetButton.addEventListener('click', resetAllStatus);
 
-        resetButton.addEventListener('click', function() {
-            localStorage.clear();
-            location.reload();
-        });
+    // 기존의 출석, 지각, 결석 상태 복사 로직
+    const attendanceButton = document.getElementById('attendance-summary');
+    const tardyButton = document.getElementById('tardy-summary');
+    const absentButton = document.getElementById('absent-summary');
 
-        const copyButton = document.getElementById('copy-button'); // '복사' 버튼의 ID가 'copy-button'으로 변경됨
-        if (copyButton) {
-            copyButton.addEventListener('click', copyAttendanceStatus);
+    attendanceButton.addEventListener('click', () => copyStatus('출석'));
+    tardyButton.addEventListener('click', () => copyStatus('지각'));
+    absentButton.addEventListener('click', () => copyStatus('결석'));
+}
+
+
+    function copyStatus(statusToCopy) {
+    const title = getTitleText(); // 날짜와 행사명을 포함한 제목 텍스트 가져오기
+    let statusList = `${statusToCopy}\n`;
+
+    const participantElements = document.querySelectorAll('.participant');
+    participantElements.forEach((element) => {
+        const serialDiv = element.querySelector('.serial-number'); // 학번
+        const nameDiv = element.querySelector('.name-box');
+        const statusButton = element.querySelector('.status-button');
+
+        if (statusButton.textContent === statusToCopy) {
+            const participantInfo = `${serialDiv.textContent}. ${nameDiv.textContent} - ${statusButton.textContent}\n`;
+            statusList += participantInfo;
         }
-    }
+    });
 
-    function copyAttendanceStatus() {
+    // 복사할 텍스트에 제목 줄 추가
+    const textToCopy = title + statusList;
+    navigator.clipboard.writeText(textToCopy).then(() => {
+        alert(`${statusToCopy} 상태의 참가자 목록이 클립보드에 복사되었습니다.`);
+    }, (err) => {
+        console.error('클립보드 복사 실패:', err);
+    });
+}
+
+// 날짜와 행사명을 포함한 제목 텍스트를 생성하는 함수
+function getTitleText() {
     const today = new Date();
     const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
     const dateString = today.toLocaleDateString('ko-KR', options); // 오늘 날짜와 요일
 
     const eventNameInput = document.getElementById('event-name-input');
-    const eventName = eventNameInput.value; // 행사명 입력 필드에서 행사명 가져오기
+    const eventName = eventNameInput.value.trim(); // 행사명 입력 필드에서 행사명 가져오기 및 공백 제거
 
-    const title = `날짜: ${dateString}\n행사명: ${eventName}\n\n`; // 제목 줄에 날짜와 행사명 추가
-
-    const participantElements = document.querySelectorAll('.participant');
-    let attendanceList = '출석\n';
-    let tardyList = '지각\n';
-    let absentList = '결석\n';
-
-    participantElements.forEach((element) => {
-        const serialDiv = element.querySelector('.serial-number'); // 학번
-        const nameDiv = element.querySelector('.name-box');
-        const statusButton = element.querySelector('.status-button');
-        const participantInfo = `${serialDiv.textContent}. ${nameDiv.textContent} - ${statusButton.textContent}\n`;
-
-        switch (statusButton.textContent) {
-            case '출석':
-                attendanceList += participantInfo;
-                break;
-            case '지각':
-                tardyList += participantInfo;
-                break;
-            case '결석':
-                absentList += participantInfo;
-                break;
-        }
-    });
-
-    // 복사할 텍스트에 제목 줄 추가
-    const attendanceText = title + attendanceList + '\n' + tardyList + '\n' + absentList;
-    navigator.clipboard.writeText(attendanceText).then(() => {
-        alert('출결 상태가 클립보드에 복사되었습니다.');
-    }, (err) => {
-        console.error('클립보드 복사 실패:', err);
-    });
+    // 행사명이 비어있는 경우 빈 줄로, 그렇지 않은 경우 '행사명: '과 함께 행사명 추가
+    return eventName ? `날짜: ${dateString}\n행사명: ${eventName}\n\n` : `날짜: ${dateString}\n\n`;
 }
 
 
