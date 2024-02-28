@@ -255,11 +255,14 @@
     </div>
 </div>
 <div style="height: 50px;"></div>
+아래는 수정된 전체 스크립트 코드입니다. 이 코드는 구글 시트에서 데이터를 가져오고, 참가자 목록을 표시하며, 각 참가자의 출석 상태를 변경할 수 있도록 합니다. 또한, 출석 상태를 '출석', '지각', '결석' 순으로 정렬하여 클립보드에 복사하는 기능도 포함되어 있습니다. 모든 버튼의 기능이 유지되며, 페이지를 새로고침하거나 다시 로드해도 이전 상태가 복원됩니다.
+
+```html
 <script>
     async function fetchSheetData() {
         const sheetId = '1JsMGoD5enBE0EtMfihOy_58HcG1dzcDfEtxn2M0Y65Q';
         const apiKey = 'AIzaSyDrClgUbT-0cFoYe4W81dyxikZVbjVlcT8';
-        const range = 'Sheet1'; // 시트 이름을 확인하고 필요에 따라 수정하세요.
+        const range = 'Sheet2';
         const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
 
         try {
@@ -271,7 +274,8 @@
             return [];
         }
     }
-function createParticipantElement(participantData, index) {
+
+    function createParticipantElement(participantData, index) {
         const [serial, name, phone, additionalPhone, photoUrl] = participantData;
 
         const participantDiv = document.createElement('div');
@@ -295,37 +299,26 @@ function createParticipantElement(participantData, index) {
         nameDiv.textContent = name || '-';
         nameDiv.classList.add('name-box');
 
-        const callButton1 = document.createElement('a');
-        if (phone && phone.trim() !== '') {
-            callButton1.href = `tel:${phone}`;
-            callButton1.className = 'call-button';
-            callButton1.textContent = '전화';
-        } else {
-            callButton1.textContent = '-';
-            participantDiv.classList.add('no-phone');
-        }
-
-        const callButton2 = document.createElement('a');
-        if (additionalPhone && additionalPhone.trim() !== '') {
-            callButton2.href = `tel:${additionalPhone}`;
-            callButton2.className = 'call-button';
-            callButton2.textContent = '학부모';
-        } else {
-            callButton2.textContent = '-';
-        }
-
-        const noteInput = document.createElement('input');
-        noteInput.type = 'text';
-        noteInput.placeholder = '출결 특이사항';
-        noteInput.classList.add('note-input');
-
         participantDiv.appendChild(numberButton);
         participantDiv.appendChild(statusButton);
         participantDiv.appendChild(serialDiv);
         participantDiv.appendChild(nameDiv);
-        participantDiv.appendChild(callButton1);
-        participantDiv.appendChild(callButton2);
-        participantDiv.appendChild(noteInput);
+
+        if (phone && phone.trim() !== '') {
+            const callButton1 = document.createElement('a');
+            callButton1.href = `tel:${phone}`;
+            callButton1.className = 'call-button';
+            callButton1.textContent = '전화';
+            participantDiv.appendChild(callButton1);
+        }
+
+        if (additionalPhone && additionalPhone.trim() !== '') {
+            const callButton2 = document.createElement('a');
+            callButton2.href = `tel:${additionalPhone}`;
+            callButton2.className = 'call-button';
+            callButton2.textContent = '학부모';
+            participantDiv.appendChild(callButton2);
+        }
 
         if (photoUrl) {
             const img = document.createElement('img');
@@ -378,10 +371,12 @@ function createParticipantElement(participantData, index) {
     }
 
     function restoreParticipantState(participantDiv, index, callback) {
-        const participantsState = JSON.parse(localStorage.getItem('participantsState') || '{}');
+        const participantsState =
+
+ JSON.parse(localStorage.getItem('participantsState') || '{}');
         const state = participantsState[index];
         if (state) {
-            if (callback) callback(state);
+            callback(state);
         }
     }
 
@@ -393,106 +388,35 @@ function createParticipantElement(participantData, index) {
             container.appendChild(participantElement);
         });
     }
-    function createParticipantElement(participantData, index) {
-        const [serial, name, phone, additionalPhone, photoUrl] = participantData;
 
-        const participantDiv = document.createElement('div');
-        participantDiv.classList.add('participant');
-        participantDiv.dataset.defaultColor = '#ffffff';
-
-        const numberButton = document.createElement('button');
-        numberButton.textContent = index + 1;
-        numberButton.classList.add('number-button');
-
-        const statusButton = document.createElement('button');
-        statusButton.textContent = '터치';
-        statusButton.classList.add('status-button');
-
-        const serialDiv = document.createElement('div');
-        serialDiv.textContent = serial;
-        serialDiv.classList.add('serial-number');
-        serialDiv.style.marginRight = '10px';
-
-        const nameDiv = document.createElement('div');
-        nameDiv.textContent = name || '-';
-        nameDiv.classList.add('name-box');
-
-        participantDiv.appendChild(numberButton);
-        participantDiv.appendChild(statusButton);
-        participantDiv.appendChild(serialDiv);
-        participantDiv.appendChild(nameDiv);
-
-        if (phone) {
-            const callButton1 = document.createElement('a');
-            callButton1.href = `tel:${phone}`;
-            callButton1.textContent = '전화';
-            callButton1.classList.add('call-button');
-            participantDiv.appendChild(callButton1);
-        }
-
-        if (additionalPhone) {
-            const callButton2 = document.createElement('a');
-            callButton2.href = `tel:${additionalPhone}`;
-            callButton2.textContent = '학부모';
-            callButton2.classList.add('call-button');
-            participantDiv.appendChild(callButton2);
-        }
-
-        if (photoUrl) {
-            const img = document.createElement('img');
-            img.src = photoUrl;
-            img.alt = 'Participant Image';
-            img.classList.add('participant-img');
-            participantDiv.appendChild(img);
-        }
-
-        let clickCount = 0;
-        statusButton.onclick = () => {
-            clickCount++;
-            switch (clickCount) {
-                case 1:
-                    participantDiv.style.backgroundColor = 'lightskyblue';
-                    statusButton.textContent = '출석';
-                    break;
-                case 2:
-                    participantDiv.style.backgroundColor = 'lightpink';
-                    statusButton.textContent = '지각';
-                    break;
-                case 3:
-                    participantDiv.style.backgroundColor = 'red';
-                    statusButton.textContent = '결석';
-                    break;
-                case 4:
-                    clickCount = 0;
-                    participantDiv.style.backgroundColor = participantDiv.dataset.defaultColor;
-                    statusButton.textContent = '터치';
-                    break;
-            }
-
-            updateSummaryCounts();
-            saveParticipantState(index, { clickCount, status: statusButton.textContent, backgroundColor: participantDiv.style.backgroundColor });
-        };
-
-        return participantDiv;
+    function showDateInfo() {
+        const dateInfoElement = document.getElementById('date-info');
+        const today = new Date();
+        const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+        const dateString = today.toLocaleDateString('ko-KR', options);
+        dateInfoElement.textContent = dateString;
     }
 
-    function saveParticipantState(index, state) {
-        const participantsState = JSON.parse(localStorage.getItem('participantsState') || '{}');
-        participantsState[index] = state;
-        localStorage.setItem('participantsState', JSON.stringify(participantsState));
-    }
+    function restoreEventData() {
+        const eventNameInput = document.getElementById('event-name-input');
+        const noteInput = document.getElementById('note-input');
 
-    async function displayParticipants() {
-        try {
-            const data = await fetchSheetData();
-            const container = document.getElementById('participants');
-            data.slice(1).forEach((participantData, index) => {
-                const participantElement = createParticipantElement(participantData, index);
-                container.appendChild(participantElement);
-            });
-        } catch (error) {
-            console.error('Error displaying participants:', error);
+        const eventName = localStorage.getItem('eventName');
+        const note = localStorage.getItem('note');
+
+        if (eventName) {
+            eventNameInput.value = eventName;
         }
+        if (note) {
+            noteInput.value = note;
+        }
+
+        eventNameInput.addEventListener('input', function() {
+            localStorage.setItem('eventName', this.value);
+        });
+        noteInput.addEventListener('input', function() {
+            localStorage.setItem('note', this.value);
+        });
     }
 
     function updateSummaryCounts() {
@@ -518,17 +442,64 @@ function createParticipantElement(participantData, index) {
         attendanceSummaryButton.textContent = `출석: ${attendanceCount}`;
         tardySummaryButton.textContent = `지각: ${tardyCount}`;
         absentSummaryButton.textContent = `결석: ${absentCount}`;
+
+        localStorage.setItem('attendanceCount', attendanceCount);
+        localStorage.setItem('tardyCount', tardyCount);
+        localStorage.setItem('absentCount', absentCount);
+    }
+
+    function setupButtons() {
+        const allAttendanceButton = document.getElementById('all-attendance-button');
+        const resetButton = document.getElementById('reset-button');
+
+        allAttendanceButton.addEventListener('click', function() {
+            document.querySelectorAll('.participant').forEach((participant, index) => {
+                const statusButton = participant.querySelector('.status-button');
+                if (statusButton.textContent !== '출석') {
+                    statusButton.textContent = '출석';
+                    participant.style.backgroundColor = 'lightskyblue';
+                    saveParticipantState(index, { clickCount: 1, status: '출석', backgroundColor: 'lightskyblue' });
+                }
+            });
+            updateSummaryCounts();
+        });
+
+        resetButton.addEventListener('click', function() {
+            localStorage.clear();
+            location.reload();
+        });
+
+        const copyAttendanceButton = document.getElementById('copy-attendance');
+        if (copyAttendanceButton) {
+            copyAttendanceButton.addEventListener('click', copyAttendanceStatus);
+        }
     }
 
     function copyAttendanceStatus() {
         const participantElements = document.querySelectorAll('.participant');
-        let attendanceText = '';
+        let attendanceList = '';
+        let tardyList = '';
+        let absentList = '';
+
         participantElements.forEach((element, index) => {
             const nameDiv = element.querySelector('.name-box');
             const statusButton = element.querySelector('.status-button');
-            attendanceText += `${index + 1}. ${nameDiv.textContent} - ${statusButton.textContent}\n`;
+            const participantInfo = `${index + 1}. ${nameDiv.textContent} - ${statusButton.textContent}\n`;
+
+            switch (statusButton.textContent) {
+                case '출석':
+                    attendanceList += participantInfo;
+                    break;
+                case '지각':
+                    tardyList += participantInfo;
+                    break;
+                case '결석':
+                    absentList += participantInfo;
+                    break;
+            }
         });
 
+        const attendanceText = `출석\n${attendanceList}\n지각\n${tardyList}\n결석\n${absentList}`;
         navigator.clipboard.writeText(attendanceText).then(() => {
             alert('출결 상태가 클립보드에 복사되었습니다.');
         }, (err) => {
@@ -536,29 +507,34 @@ function createParticipantElement(participantData, index) {
         });
     }
 
-    window.onload = async () => {
-       displayParticipants();
-    showDateInfo();
-    setupButtons(); // 버튼 기능 설정
-    restoreParticipantStates(); // 참가자 상태 복원
-    restoreEventData(); // 이벤트 데이터 복원
-    updateSummaryCounts(); // 출석, 지각, 결석 수 업데이트 await displayParticipants();
+    function restoreParticipantStates() {
+        const participantElements = document.querySelectorAll('.participant');
+        participantElements.forEach((element, index) => {
+            restoreParticipantState(element, index,
+
+ (state) => {
+                const statusButton = element.querySelector('.status-button');
+                element.style.backgroundColor = state.backgroundColor;
+                statusButton.textContent = state.status;
+                // 터치 횟수가 0이 아닌 경우에만 상태를 업데이트
+                if (state.clickCount !== 0) {
+                    updateSummaryCounts();
+                }
+            });
+        });
+    }
+
+    window.onload = () => {
+        displayParticipants();
         showDateInfo();
-        setupButtons();
+        setupButtons(); // 버튼 기능 설정
+        restoreParticipantStates(); // 참가자 상태 복원
+        restoreEventData(); // 이벤트 데이터 복원
+        updateSummaryCounts(); // 출석, 지각, 결석 수 업데이트
     };
-
-    function showDateInfo() {
-        const dateInfoElement = document.getElementById('date-info');
-        const today = new Date();
-        const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
-        const dateString = today.toLocaleDateString('ko-KR', options);
-        dateInfoElement.textContent = dateString;
-    }
-
-    function setupButtons() {
-        const copyAttendanceButton = document.getElementById('copy-attendance');
-        copyAttendanceButton.addEventListener('click', copyAttendanceStatus);
-    }
 </script>
+
+
+
 </body>
 </html>
