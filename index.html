@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Dongle:wght@300&display=swap" rel="stylesheet">
     <!-- HTML2Canvas 라이브러리 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
-    <style>
+   <style>
         body {
             font-family: 'Dongle', sans-serif;
             font-size: 150%;
@@ -228,7 +229,8 @@
             font-size: 12px; /* 모바일에서 폰트 크기를 더 줄임 */
             padding: 4px 8px; /* 모바일에서 패딩을 더 줄임 */
         }
-</head>
+    </style>
+	</head>
 <body>
 
 <div class="date-info-container">
@@ -245,7 +247,7 @@
     <button id="attendance-summary" class="summary-button">출석: 0</button>
     <button id="tardy-summary" class="summary-button">지각: 0</button>
     <button id="absent-summary" class="summary-button">결석: 0</button>
-    <button id="copy-attendance" class="control-button">복사</button>
+    <button id="copy-button" class="control-button">복사</button> <!-- ID가 'copy-button'인 '복사' 버튼 -->
 </div>
 
 <div id="popup-overlay" class="popup-overlay">
@@ -255,14 +257,12 @@
     </div>
 </div>
 <div style="height: 50px;"></div>
-아래는 수정된 전체 스크립트 코드입니다. 이 코드는 구글 시트에서 데이터를 가져오고, 참가자 목록을 표시하며, 각 참가자의 출석 상태를 변경할 수 있도록 합니다. 또한, 출석 상태를 '출석', '지각', '결석' 순으로 정렬하여 클립보드에 복사하는 기능도 포함되어 있습니다. 모든 버튼의 기능이 유지되며, 페이지를 새로고침하거나 다시 로드해도 이전 상태가 복원됩니다.
 
-```html
 <script>
     async function fetchSheetData() {
         const sheetId = '1JsMGoD5enBE0EtMfihOy_58HcG1dzcDfEtxn2M0Y65Q';
         const apiKey = 'AIzaSyDrClgUbT-0cFoYe4W81dyxikZVbjVlcT8';
-        const range = 'Sheet2';
+        const range = 'Sheet1';
         const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
 
         try {
@@ -371,9 +371,7 @@
     }
 
     function restoreParticipantState(participantDiv, index, callback) {
-        const participantsState =
-
- JSON.parse(localStorage.getItem('participantsState') || '{}');
+        const participantsState = JSON.parse(localStorage.getItem('participantsState') || '{}');
         const state = participantsState[index];
         if (state) {
             callback(state);
@@ -469,50 +467,60 @@
             location.reload();
         });
 
-        const copyAttendanceButton = document.getElementById('copy-attendance');
-        if (copyAttendanceButton) {
-            copyAttendanceButton.addEventListener('click', copyAttendanceStatus);
+        const copyButton = document.getElementById('copy-button'); // '복사' 버튼의 ID가 'copy-button'으로 변경됨
+        if (copyButton) {
+            copyButton.addEventListener('click', copyAttendanceStatus);
         }
     }
 
     function copyAttendanceStatus() {
-        const participantElements = document.querySelectorAll('.participant');
-        let attendanceList = '';
-        let tardyList = '';
-        let absentList = '';
+    const today = new Date();
+    const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+    const dateString = today.toLocaleDateString('ko-KR', options); // 오늘 날짜와 요일
 
-        participantElements.forEach((element, index) => {
-            const nameDiv = element.querySelector('.name-box');
-            const statusButton = element.querySelector('.status-button');
-            const participantInfo = `${index + 1}. ${nameDiv.textContent} - ${statusButton.textContent}\n`;
+    const eventNameInput = document.getElementById('event-name-input');
+    const eventName = eventNameInput.value; // 행사명 입력 필드에서 행사명 가져오기
 
-            switch (statusButton.textContent) {
-                case '출석':
-                    attendanceList += participantInfo;
-                    break;
-                case '지각':
-                    tardyList += participantInfo;
-                    break;
-                case '결석':
-                    absentList += participantInfo;
-                    break;
-            }
-        });
+    const title = `날짜: ${dateString}\n행사명: ${eventName}\n\n`; // 제목 줄에 날짜와 행사명 추가
 
-        const attendanceText = `출석\n${attendanceList}\n지각\n${tardyList}\n결석\n${absentList}`;
-        navigator.clipboard.writeText(attendanceText).then(() => {
-            alert('출결 상태가 클립보드에 복사되었습니다.');
-        }, (err) => {
-            console.error('클립보드 복사 실패:', err);
-        });
-    }
+    const participantElements = document.querySelectorAll('.participant');
+    let attendanceList = '출석\n';
+    let tardyList = '지각\n';
+    let absentList = '결석\n';
+
+    participantElements.forEach((element) => {
+        const serialDiv = element.querySelector('.serial-number'); // 학번
+        const nameDiv = element.querySelector('.name-box');
+        const statusButton = element.querySelector('.status-button');
+        const participantInfo = `${serialDiv.textContent}. ${nameDiv.textContent} - ${statusButton.textContent}\n`;
+
+        switch (statusButton.textContent) {
+            case '출석':
+                attendanceList += participantInfo;
+                break;
+            case '지각':
+                tardyList += participantInfo;
+                break;
+            case '결석':
+                absentList += participantInfo;
+                break;
+        }
+    });
+
+    // 복사할 텍스트에 제목 줄 추가
+    const attendanceText = title + attendanceList + '\n' + tardyList + '\n' + absentList;
+    navigator.clipboard.writeText(attendanceText).then(() => {
+        alert('출결 상태가 클립보드에 복사되었습니다.');
+    }, (err) => {
+        console.error('클립보드 복사 실패:', err);
+    });
+}
+
 
     function restoreParticipantStates() {
         const participantElements = document.querySelectorAll('.participant');
         participantElements.forEach((element, index) => {
-            restoreParticipantState(element, index,
-
- (state) => {
+            restoreParticipantState(element, index, (state) => {
                 const statusButton = element.querySelector('.status-button');
                 element.style.backgroundColor = state.backgroundColor;
                 statusButton.textContent = state.status;
@@ -524,17 +532,15 @@
         });
     }
 
-    window.onload = () => {
-        displayParticipants();
+    window.onload = async () => {
+        await displayParticipants();
         showDateInfo();
-        setupButtons(); // 버튼 기능 설정
-        restoreParticipantStates(); // 참가자 상태 복원
-        restoreEventData(); // 이벤트 데이터 복원
-        updateSummaryCounts(); // 출석, 지각, 결석 수 업데이트
+        setupButtons();
+        restoreParticipantStates();
+        restoreEventData();
+        updateSummaryCounts();
     };
 </script>
-
-
 
 </body>
 </html>
