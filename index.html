@@ -537,7 +537,12 @@ function createParticipantElement(participantData, index) {
     }
 
     window.onload = async () => {
-        await displayParticipants();
+       displayParticipants();
+    showDateInfo();
+    setupButtons(); // 버튼 기능 설정
+    restoreParticipantStates(); // 참가자 상태 복원
+    restoreEventData(); // 이벤트 데이터 복원
+    updateSummaryCounts(); // 출석, 지각, 결석 수 업데이트 await displayParticipants();
         showDateInfo();
         setupButtons();
     };
