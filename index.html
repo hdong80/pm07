@@ -366,7 +366,9 @@ function createParticipantElement(participantData, index) {
         clickCount = state.clickCount;
         statusButton.textContent = state.status;
         participantDiv.style.backgroundColor = state.backgroundColor;
-        remarkInput.value = state.remark || '';
+        if (state.remark) {
+            remarkInput.value = state.remark;
+        }
     });
 
     return participantDiv;
@@ -468,37 +470,22 @@ function copyAttendanceStatus() {
     const eventNameInput = document.getElementById('event-name-input');
     const eventName = eventNameInput.value;
 
-    const title = `날짜: ${dateString}\n행사명: ${eventName}\n\n`;
+    let csvText = `날짜: ${dateString}\t행사명: ${eventName}\n\n`;
+    csvText += "학번\t이름\t출결\t특이사항\n";
 
     const participantElements = document.querySelectorAll('.participant');
-    let attendanceList = '출석\n';
-    let tardyList = '지각\n';
-    let absentList = '결석\n';
-
     participantElements.forEach((element) => {
         const serialDiv = element.querySelector('.serial-number');
         const nameDiv = element.querySelector('.name-box');
         const statusButton = element.querySelector('.status-button');
         const remarkInput = element.querySelector('.remark-input');
-        const remark = remarkInput && remarkInput.value ? ` (${remarkInput.value})` : '';
-        const participantInfo = `${serialDiv.textContent}. ${nameDiv.textContent} - ${statusButton.textContent}${remark}\n`;
+        const remark = remarkInput.value;
 
-        switch (statusButton.textContent) {
-            case '출석':
-                attendanceList += participantInfo;
-                break;
-            case '지각':
-                tardyList += participantInfo;
-                break;
-            case '결석':
-                absentList += participantInfo;
-                break;
-        }
+        csvText += `${serialDiv.textContent}\t${nameDiv.textContent}\t${statusButton.textContent}\t${remark}\n`;
     });
 
-    const attendanceText = title + attendanceList + '\n' + tardyList + '\n' + absentList;
-    navigator.clipboard.writeText(attendanceText).then(() => {
-        alert('출결 상태가 클립보드에 복사되었습니다.');
+    navigator.clipboard.writeText(csvText).then(() => {
+        alert('출결 상태가 클립보드에 복사되었습니다. 엑셀에 붙여넣기를 시도하세요.');
     }, (err) => {
         console.error('클립보드 복사 실패:', err);
     });
@@ -527,7 +514,6 @@ window.onload = async () => {
     showDateInfo();
     setupButtons();
     restoreParticipantStates();
-    restoreEventData();
     updateSummaryCounts();
 };
 </script>
